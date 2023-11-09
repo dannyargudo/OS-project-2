@@ -14,7 +14,7 @@ main_pr
 #define PAGESIZE 256
 #define BUF_SIZE 256
 //Assuming smaller physical address space
-#define PHYSICALMEMORYSIZE 256
+#define PHYSICALMEMORYSIZE 128
 #define TLBENTRIES 16
 
 //Output file names
@@ -140,7 +140,7 @@ int demand_paging(int pageNum, char *physMem, int *curFrame) {
     }
     else
     {
-        printf("Error: Attempting to exceed physical memory bounds\n");
+        //printf("Error: Attempting to exceed physical memory bounds\n");
         return -1;
     }
 }
@@ -204,14 +204,14 @@ int find_page(int logicalAddr, struct pageTable* PT, struct TLB *tlb, char *phys
 
     //calculate physical address and value
     int physicalAddr = ((unsigned char)frame*PHYSICALMEMORYSIZE) + offset;
-    printf("Before acccesing physMem\n");
+    //printf("Before acccesing physMem\n");
     if(frame >= 0 && frame < PHYSICALMEMORYSIZE && physMem != NULL)
     {
         value = physMem[frame * PHYSICALMEMORYSIZE + (int)offset];
-        printf("After accesing physMem\n");
+        //printf("After accesing physMem\n");
     }
     else{
-        printf("Error:Invalid frame or physMem is null\n");
+        //printf("Error:Invalid frame or physMem is null\n");
         //exit(EXIT_FAILURE);
     }
 
@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
     memset(tlb.TLBframe, -1, sizeof(tlb.TLBframe));
     tlb.ind = 0;
 
-    char PhyMem[PHYSICALMEMORYSIZE * PHYSICALMEMORYSIZE];
+    char* PhyMem = (char*)malloc(PHYSICALMEMORYSIZE * PHYSICALMEMORYSIZE);
 
     FILE* fd = fopen(argv[1], "r");
     if(fd == NULL)
@@ -266,7 +266,7 @@ int main(int argc, char* argv[]) {
 
     //read file, call find_page for each address
     while (fscanf(fd, "%d", &val) == 1) {
-        printf("Read value: %d\n", val);
+        //printf("Read value: %d\n", val);
         find_page(val, PageTable, &tlb, (char*)PhyMem, &openFrame, &numPageFaults, &TLBhits, pQueue, PHYSICALMEMORYSIZE, outputFile1, outputFile2, outputFile3);
         numAddresses++;
     }
@@ -281,6 +281,7 @@ int main(int argc, char* argv[]) {
     fclose(outputFile1);
     fclose(outputFile2);
     fclose(outputFile3);
+    free(PhyMem);
 
     return 0;
 }
