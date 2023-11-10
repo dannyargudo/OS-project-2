@@ -13,7 +13,7 @@ main_pr
 //define constants
 #define PAGESIZE 256
 #define BUF_SIZE 256
-//Assuming smaller physical address space
+//physical address space
 #define PHYSICALMEMORYSIZE 128
 #define TLBENTRIES 16
 
@@ -126,7 +126,7 @@ int demand_paging(int pageNum, char *physMem, int *curFrame) {
     FILE *bin = fopen("BACKING_STORE.bin", "rb");
 
     fseek(bin, pageNum * PHYSICALMEMORYSIZE, SEEK_SET);
-    fread(buffer, sizeof(char), PHYSICALMEMORYSIZE, bin);
+    fread(buffer, sizeof(char), BUF_SIZE, bin);
     fclose(bin);
     if((*curFrame) < PHYSICALMEMORYSIZE)
     {
@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
     memset(tlb.TLBframe, -1, sizeof(tlb.TLBframe));
     tlb.ind = 0;
 
-    char* PhyMem = (char*)malloc(PHYSICALMEMORYSIZE * PHYSICALMEMORYSIZE);
+    char PhyMem[PHYSICALMEMORYSIZE * PHYSICALMEMORYSIZE];
 
     FILE* fd = fopen(argv[1], "r");
     if(fd == NULL)
@@ -281,7 +281,6 @@ int main(int argc, char* argv[]) {
     fclose(outputFile1);
     fclose(outputFile2);
     fclose(outputFile3);
-    free(PhyMem);
 
     return 0;
 }
